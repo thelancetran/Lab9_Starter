@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+  <!--TRACKJS Script-->
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "4570092407c04737811f9aa050810907"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+  <!--TRACKJS Script--> 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,9 +94,17 @@
       <button>Console Trace</button>
       <button>Trigger a Global Error</button>
     </section>
-  </main>
+  </main>      
 
   <script>
+    // *****Custom DivisionByZeroError Object*****
+    class DivisionByZeroError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "DivisionByZeroError";
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -96,12 +113,130 @@
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
       output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      // STEP 3: Try-Catch-Finally
+      let finalOutput = NaN;
+      try {
+        if (operator == `/` && secondNum == 0) {
+          // STEP 4: Throw and Extending Error to Custom Error Type
+          throw new DivisionByZeroError("Cannot Divide By 0");
+        }
+        finalOutput = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
+      catch(err) {
+        console.error(err);
+        finalOutput = `Undefined`;
+      }
+      finally {
+        output.innerHTML = finalOutput;
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    let logBtn = errorBtns[0];
+    logBtn.addEventListener('click', () => {
+      console.log('Console Log Demo');
+    });
+
+    let errBtn = errorBtns[1];
+    errBtn.addEventListener('click', () => {
+      console.error('Console Error Demo');
+    });
+
+    let countBtn = errorBtns[2];
+    countBtn.addEventListener('click', () => {
+      console.count('Count Button');
+    });
+
+    let warnBtn = errorBtns[3];
+    warnBtn.addEventListener('click', () => {
+      console.warn('Console Warn Button');
+    });
+
+    let asrtBtn = errorBtns[4];
+    asrtBtn.addEventListener('click', () => {
+      console.assert(2 == 3, {
+        number: 2,
+        errorMsg: 'The number does not equal 3'
+      });
+    });
+
+    let clearBtn = errorBtns[5];
+    clearBtn.addEventListener('click', () => {
+      console.clear();
+    });
+
+    let dirBtn = errorBtns[6];
+    dirBtn.addEventListener('click', () => {
+      console.dir(dirBtn);
+    });
+
+    let xmlBtn = errorBtns[7];
+    xmlBtn.addEventListener('click', () => {
+      console.dirxml(xmlBtn);
+    });
+
+    let grpBtn = errorBtns[8];
+    grpBtn.addEventListener('click', () => {
+      console.group();
+    });
+
+    let grpEndBtn = errorBtns[9];
+    grpEndBtn.addEventListener('click', () => {
+      console.groupEnd();
+    });
+
+    let tableBtn = errorBtns[10];
+    tableBtn.addEventListener('click', () => {
+      console.table([
+        {name: 'Software Engineering', num: 110},
+        {name: 'Programming Languages', num: 130},
+        {name: 'Advanced Software Engineering', num: 112}
+      ]);
+    });
+
+    let startTimeBtn = errorBtns[11];
+    startTimeBtn.addEventListener('click', () => {
+      console.time('Timer Button');
+    });
+
+    let stopTimeBtn = errorBtns[12];
+    stopTimeBtn.addEventListener('click', () => {
+      console.timeEnd('Timer Button');
+    });
+
+    let traceBtn = errorBtns[13];
+    traceBtn.addEventListener('click', () => {
+      function deepest() { console.trace(); }
+      function deeper() { deepest(); }
+      function deep() { deeper(); }
+      function handleBtnClick() { deep(); }
+      handleBtnClick();
+    });
+
+    let globalErrBtn = errorBtns[14];
+    globalErrBtn.addEventListener('click', () => {
+      boom();
+    });
+
+    // STEP 5: Global Error Handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      const errorMsg = {
+        message: message,
+        source: source,
+        lineno: lineno,
+        colno: colno,
+        stack: error ? error.stack : null
+      };
+      console.log('Sadly an error happened my friend')
+      console.error(errorMsg.stack);
+      return true; // Prevents the default browser error handler
+    };
+
   </script>
 </body>
 
